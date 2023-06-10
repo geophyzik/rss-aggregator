@@ -1,74 +1,63 @@
 /* eslint-disable */
 import * as yup from 'yup';
-import onChange from 'on-change';
+import watch from './view.js';
+import ru from './locales/ru';
+import en from './locales/en';
+import i18next from 'i18next';
 
-const init = () => {
+export default async () => {
+
+  const defaultLanguage = 'ru';
+  const i18n = i18next.createInstance();
+  i18n.init({
+    lng: defaultLanguage,
+    debug: true,
+    resources: { ru } ,
+  });
+
   const state = {
-    processState: '',
-    errors: '',
-    valid: '',
+    form: {
+      processState: '',
+      errors: '',
+      validState: '',
+    },
     
     feeds: [],
     posts: [],
   }
 
-  const rssForm = document.querySelector('.rss-form');
-  const input = document.querySelector('input');
-  const feedback = document.querySelector('.feedback');
-
-  const render = () => {
-  
-    if (state.valid === 'invalid') {
-      console.log('lol_invalid')
-      input.classList.remove('is-valid');
-      input.classList.add('is-invalid');
-      feedback.classList.remove('text-success');
-      feedback.classList.add('text-danger');
-      feedback.textContent = 'Ссылка должна быть валидным URL';
-    }
-
-    if (state.valid === 'valid') {
-      console.log('lol_valid')
-      input.classList.remove('is-invalid');
-      input.classList.add('is-valid');
-      feedback.classList.remove('text-danger');
-      feedback.classList.add('text-success');
-      feedback.textContent = 'RSS успешно загружен';
-    }
-
-    rssForm.reset();
-    input.focus();
+  const elements = {
+   rssForm: document.querySelector('.rss-form'),
+   input: document.querySelector('input'),
+   feedback: document.querySelector('.feedback'),
   };
+  
+  const watchedState = watch(elements, state, i18n);
 
-  const watchedState = onChange(state, render);
-
-  rssForm.addEventListener('submit', async (e) => {
+  elements.rssForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const link = formData.get('url');
+
     const schema = yup.object().shape({
-      link: yup.string().min(1).url('badUrl').notOneOf([...state.feeds],'duplicate'),
+      link: yup.string().min(1)
+        .url(i18n.t('errors.badUrl'))
+        .notOneOf([...state.feeds],i18n.t('errors.duplicate')),
       });
 
     schema.validate({link})
       .then((res) => {
-        //watchedState.processState = 'filling';
-        watchedState.valid = 'valid';
+        //watchedState.processState = 'filling'; mb nado budet
+        watchedState.form.validState = 'valid';
         state.feeds.push(link);
-
-        console.log('LINK VALID vse ok!!!')
-        console.log(state)
+       // console.log(state)
       })
       .catch((e) => {
-        //watchedState.errors = e.errors;
-        watchedState.valid = 'invalid'; 
-
-        console.log('LINK INVALID vse BAD!!!'+e.errors)
-        console.log(state)
+        state.form.errors = e.errors;
+        watchedState.form.validState = 'invalid'; 
+        //console.log(state)
       });
 
      //console.log([...state.feeds])
   });
 };
-
-export default app;
