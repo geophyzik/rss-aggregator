@@ -33,6 +33,7 @@
     "yup": "^1.2.0"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "bootstrap": "^5.2.3",
     "on-change": "^4.0.2"
   }

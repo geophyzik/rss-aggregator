@@ -4,6 +4,7 @@ import watch from './view.js';
 import ru from './locales/ru';
 import en from './locales/en';
 import i18next from 'i18next';
+import parserRSS from './parserRSS.js';
 
 export default async () => {
 
@@ -31,7 +32,7 @@ export default async () => {
    input: document.querySelector('input'),
    feedback: document.querySelector('.feedback'),
   };
-  
+
   const watchedState = watch(elements, state, i18n);
 
   elements.rssForm.addEventListener('submit', async (e) => {
@@ -50,6 +51,18 @@ export default async () => {
         //watchedState.processState = 'filling'; mb nado budet
         watchedState.form.validState = 'valid';
         state.feeds.push(link);
+        console.log('before axios')
+        console.log(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent('https://ru.hexlet.io/lessons.rss')}`)
+        axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent('https://ru.hexlet.io/lessons.rss')}`)
+          .then((response) => {
+            parserRSS(response)
+            console.log('hi')
+            console.log(response.text);
+          })
+          .catch((err) => {
+            console.log(err)  
+          });
+        console.log('after axios')
        // console.log(state)
       })
       .catch((e) => {
