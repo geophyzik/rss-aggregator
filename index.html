@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-        <title>Hexlet Frontend Project</title>
+        <title>Hexlet Frontend Project RSS</title>
     </head>
     <body class="d-flex flex-column min-vh-100">
         <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
@@ -30,7 +30,14 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-floating">
-                                        <input id="url-input" autofocus="" required="" name="url" aria-label="url" class="form-control w-100" placeholder="ссылка RSS" autocomplete="off"> 
+                                        <input id="url-input" list="url-choice" autofocus="" required="" name="url" aria-label="url" class="form-control w-100" placeholder="ссылка RSS" autocomplete="off"> 
+                                        <datalist id="url-choice">
+                                            <option value="https://ru.hexlet.io/lessons.rss">
+                                            <option value="https://aljazeera.com/xml/rss/all.xml">
+                                            <option value="https://buzzfeed.com/world.xml">
+                                            <option value="https://thecipherbrief.com/feed">
+                                            <option value="https://news.yandex.ru/daily.rss - bad-url">
+                                        </datalist>
                                         <label for="url-input">Ссылка RSS</label>
                                     </div>
                                 </div>

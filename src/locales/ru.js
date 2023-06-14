@@ -5,5 +5,8 @@ export default {
       duplicate: 'RSS уже существует',
     },
     success: 'RSS успешно загружен',
+    lookPost: 'Просмотр',
+    feeds: 'Фиды',
+    posts: 'Посты',
   },
 };
