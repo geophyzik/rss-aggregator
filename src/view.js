@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import onChange from 'on-change';
 
 const renderPosts = (elements, state, i18n) => {
@@ -11,10 +12,6 @@ const renderPosts = (elements, state, i18n) => {
   postsTitle.classList.add('card-title', 'h4');
   postsList.classList.add('list-group', 'border-0', 'rounded-0');
   postsTitle.textContent = i18n.t('posts');
-
-  elements.containers.feedsContainer.append(postsBox);
-  postsBox.append(postsTitleBox);
-  postsTitleBox.append(postsTitle, postsList);
 
   state.posts.forEach((element) => {
     const post = document.createElement('li');
@@ -38,6 +35,10 @@ const renderPosts = (elements, state, i18n) => {
     postsList.append(post);
     post.append(postTitle, postButton);
   });
+
+  elements.containers.postsContainer.replaceChildren(postsBox);
+  postsBox.append(postsTitleBox);
+  postsTitleBox.append(postsTitle, postsList);
 };
 
 const renderFeeds = (elements, state, i18n) => {
@@ -100,8 +101,10 @@ export default (elements, state, i18n) => {
         renderState(elements, state, i18n);
         break;
       case 'form.processState':
-        renderFeeds(elements, state, i18n);
-        renderPosts(elements, state, i18n);
+        if (state.form.processState === 'work') {
+          renderFeeds(elements, state, i18n);
+          renderPosts(elements, state, i18n);
+        }
         break;
       default:
         break;

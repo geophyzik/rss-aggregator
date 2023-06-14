@@ -1,6 +1,5 @@
 export default (response) => {
   const parseData = new DOMParser().parseFromString(response.data.contents, 'text/html');
-
   try {
     const feed = {
       title: parseData.querySelector('title').textContent,
@@ -16,7 +15,6 @@ export default (response) => {
         link: el.querySelector('link').nextSibling.textContent.trim(),
       });
     });
-    // console.log(feed, posts)
     return { feed, posts };
   } catch (e) {
     e.message = 'unableToParse';

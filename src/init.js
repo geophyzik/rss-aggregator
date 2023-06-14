@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
@@ -35,7 +36,7 @@ export default async () => {
     },
   };
 
-  const fullUrl = (link) => {
+  const completionURL = (link) => {
     const allOrigin = 'https://allorigins.hexlet.app/get?disableCache=true&url=';
     const encode = encodeURIComponent(link);
     return `${allOrigin}+${encode}`;
@@ -50,9 +51,34 @@ export default async () => {
 
   const watchedState = watch(elements, state, i18n);
 
+  const checkUpdatePosts = () => {
+    state.feeds.forEach((eachFeed) => {
+      axios.get(completionURL(eachFeed.url))
+        .then((response) => {
+          const newData = parserRSS(response);
+          // eslint-disable-next-line max-len
+          const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
+          newPost.forEach((el) => {
+            // eslint-disable-next-line no-param-reassign
+            el.id = eachFeed.id;
+          });
+          state.posts = [...state.posts, ...newPost];
+
+          watchedState.form.processState = 'work';
+          state.form.processState = 'chill';
+        })
+        .catch((e) => {
+          // state.form.errors = 'Ресурс не содержит валидный RSS';
+          // watchedState.form.validState = 'invalid';
+          throw e;
+        });
+    });
+    setTimeout(checkUpdatePosts, 5000);
+  };
+
   elements.rssForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    state.form.processState = 'filling';
+    state.form.processState = 'chill';
     state.form.validState = 'none';
     const formData = new FormData(event.target);
     const link = formData.get('url');
@@ -60,12 +86,12 @@ export default async () => {
     const schema = yup.object().shape({
       link: yup.string().min(1)
         .url(i18n.t('errors.badUrl'))
-        .notOneOf(state.feeds.map((feed) => feed.url), i18n.t('errors.duplicate')),
+        .notOneOf(state.feeds.map((feed) => feed.url.trim()), i18n.t('errors.duplicate')),
     });
 
     schema.validate({ link })
       .then(() => {
-        axios.get(fullUrl(link))
+        axios.get(completionURL(link))
           .then((response) => {
             watchedState.form.validState = 'valid';
             const data = parserRSS(response);
@@ -77,7 +103,9 @@ export default async () => {
             });
             state.feeds.push(data.feed);
             state.posts = [...state.posts, ...data.posts];
-            watchedState.form.processState = 'succes';
+            watchedState.form.processState = 'work';
+            state.form.processState = 'chill';
+            checkUpdatePosts();
           })
           .catch((e) => {
             state.form.errors = 'Ресурс не содержит валидный RSS';
