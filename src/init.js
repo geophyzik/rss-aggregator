@@ -24,12 +24,15 @@ export default async () => {
 
     feeds: [],
     posts: [],
+
+    UIstate: [],
   };
 
   const elements = {
     rssForm: document.querySelector('.rss-form'),
     input: document.querySelector('input'),
     feedback: document.querySelector('.feedback'),
+    buttonsPost: document.querySelectorAll('li > .btn-sm'),
     containers: {
       postsContainer: document.querySelector('.container-xxl > div > .posts'),
       feedsContainer: document.querySelector('.container-xxl > div > .feeds'),
@@ -42,7 +45,7 @@ export default async () => {
     return `${allOrigin}+${encode}`;
   };
 
-  const count = (() => {
+  const generateId = (() => {
     let num = 0;
     // eslint-disable-next-line no-plusplus
     const func = () => ++num;
@@ -73,6 +76,7 @@ export default async () => {
           throw e;
         });
     });
+    console.log('end update', state);
     setTimeout(checkUpdatePosts, 5000);
   };
 
@@ -95,17 +99,17 @@ export default async () => {
           .then((response) => {
             watchedState.form.validState = 'valid';
             const data = parserRSS(response);
-            const idNumber = count();
-            data.feed.id = idNumber;
+            data.feed.id = generateId();
             data.posts.forEach((el) => {
               // eslint-disable-next-line no-param-reassign
-              el.id = idNumber;
+              el.id = generateId();
             });
             state.feeds.push(data.feed);
             state.posts = [...state.posts, ...data.posts];
             watchedState.form.processState = 'work';
             state.form.processState = 'chill';
-            checkUpdatePosts();
+            checkUpdatePosts();                          // рефрешер постов
+            console.log('___state', state)
           })
           .catch((e) => {
             state.form.errors = 'Ресурс не содержит валидный RSS';
@@ -120,4 +124,13 @@ export default async () => {
         throw e;
       });
   });
+
+  // document.querySelectorAll('li > .btn-sm').forEach((button) => {
+  //   console.log('baton',button)
+  //   button.addEventListener('click', (e) => {
+  //     // const targetTab = e.target;
+  //     // console.log(e)
+  //     alert('wow')
+  //   });
+  // });
 };
