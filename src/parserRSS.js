@@ -11,7 +11,8 @@ export default (response) => {
 
     parseData.querySelectorAll('item').forEach((el) => {
       posts.push({
-        postName: el.querySelector('title').textContent,
+        title: el.querySelector('title').textContent,
+        description: el.querySelector('description').textContent,
         link: el.querySelector('link').nextSibling.textContent.trim(),
       });
     });

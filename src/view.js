@@ -29,11 +29,16 @@ const renderPosts = (elements, state, i18n) => {
     postButton.setAttribute('data-bs-target', '#modal');
     postButton.setAttribute('data-id', element.id);
 
-    postTitle.textContent = element.postName;
+    postTitle.textContent = element.title;
     postButton.textContent = i18n.t('lookPost');
 
     postsList.append(post);
     post.append(postTitle, postButton);
+
+    if (state.UIstate.viewedPostsId.includes(`${element.id}`)) {
+      postTitle.classList.remove('fw-bold');
+      postTitle.classList.add('fw-normal', 'link-secondary');
+    }
   });
 
   elements.containers.postsContainer.replaceChildren(postsBox);
@@ -94,16 +99,47 @@ const renderState = (elements, state, i18n) => {
   elements.input.focus();
 };
 
+const modalWindow = (state) => {
+  const titleModal = document.querySelector('.modal-title');
+  const bodyModal = document.querySelector('.modal-body');
+  const btnModal = document.querySelector('.btn-primary');
+
+  const arrayId = state.UIstate.viewedPostsId;
+  const latestId = Number(arrayId[arrayId.length - 1]);
+  const postModal = state.posts.filter((post) => post.id === latestId);
+  const { title, description, link } = postModal[0];
+  const postElement = document.querySelector(`[data-id='${latestId}']`);
+
+  if (postElement) {
+    postElement.classList.remove('fw-bold');
+    postElement.classList.add('fw-normal', 'link-secondary');
+  }
+
+  titleModal.textContent = title;
+  bodyModal.textContent = description;
+  btnModal.href = link;
+};
+
 export default (elements, state, i18n) => {
   const watchedState = onChange(state, (path) => {
+    const mainButton = elements.mainBtn;
     switch (path) {
       case 'form.validState':
         renderState(elements, state, i18n);
+        mainButton.disabled = false;
         break;
       case 'form.processState':
-        if (state.form.processState === 'work') {
+        if (state.form.processState === 'success') {
           renderFeeds(elements, state, i18n);
           renderPosts(elements, state, i18n);
+          mainButton.disabled = false;
+        }
+        if (state.form.processState === 'openModalWindow') {
+          modalWindow(state);
+          mainButton.disabled = false;
+        }
+        if (state.form.processState === 'processing') {
+          mainButton.disabled = true;
         }
         break;
       default:

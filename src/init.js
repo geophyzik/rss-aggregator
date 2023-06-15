@@ -25,14 +25,16 @@ export default async () => {
     feeds: [],
     posts: [],
 
-    UIstate: [],
+    UIstate: {
+      viewedPostsId: [],
+    },
   };
 
   const elements = {
     rssForm: document.querySelector('.rss-form'),
+    mainBtn: document.querySelector('[type="submit"]'),
     input: document.querySelector('input'),
     feedback: document.querySelector('.feedback'),
-    buttonsPost: document.querySelectorAll('li > .btn-sm'),
     containers: {
       postsContainer: document.querySelector('.container-xxl > div > .posts'),
       feedsContainer: document.querySelector('.container-xxl > div > .feeds'),
@@ -76,7 +78,6 @@ export default async () => {
           throw e;
         });
     });
-    console.log('end update', state);
     setTimeout(checkUpdatePosts, 5000);
   };
 
@@ -95,6 +96,7 @@ export default async () => {
 
     schema.validate({ link })
       .then(() => {
+        watchedState.form.processState = 'processing';
         axios.get(completionURL(link))
           .then((response) => {
             watchedState.form.validState = 'valid';
@@ -106,10 +108,10 @@ export default async () => {
             });
             state.feeds.push(data.feed);
             state.posts = [...state.posts, ...data.posts];
-            watchedState.form.processState = 'work';
+            watchedState.form.processState = 'success';
             state.form.processState = 'chill';
-            checkUpdatePosts();                          // рефрешер постов
-            console.log('___state', state)
+            // eslint-disable-next-line no-multi-spaces
+            checkUpdatePosts();                                       // refresh post function
           })
           .catch((e) => {
             state.form.errors = 'Ресурс не содержит валидный RSS';
@@ -120,17 +122,28 @@ export default async () => {
       .catch((e) => {
         state.form.errors = e.errors;
         watchedState.form.validState = 'invalid';
+        state.form.processState = 'chill';
         e.message = 'validate error';
         throw e;
       });
   });
 
-  // document.querySelectorAll('li > .btn-sm').forEach((button) => {
-  //   console.log('baton',button)
-  //   button.addEventListener('click', (e) => {
-  //     // const targetTab = e.target;
-  //     // console.log(e)
-  //     alert('wow')
-  //   });
-  // });
+  elements.containers.postsContainer.addEventListener('click', (e) => {
+    const click = e.target;
+    const idLatest = click.dataset.id;
+    switch (click.tagName) {
+      case 'BUTTON':
+        state.UIstate.viewedPostsId = [...state.UIstate.viewedPostsId, ...idLatest];
+        watchedState.form.processState = 'openModalWindow';
+        state.form.processState = 'chill';
+        break;
+      case 'A':
+        state.UIstate.viewedPostsId = [...state.UIstate.viewedPostsId, ...idLatest];
+        watchedState.form.processState = 'work';
+        state.form.processState = 'chill';
+        break;
+      default:
+        break;
+    }
+  });
 };
