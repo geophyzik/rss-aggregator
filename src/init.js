@@ -73,7 +73,7 @@ export default async () => {
           state.form.processState = 'chill';
         })
         .catch((e) => {
-          throw e;
+          console.log(e.message);
         });
     });
     setTimeout(checkUpdatePosts, 5000);
