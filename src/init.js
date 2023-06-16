@@ -87,7 +87,7 @@ export default async () => {
     const link = formData.get('url');
 
     const schema = yup.object().shape({
-      link: yup.string().min(1)
+      link: yup.string().required().trim()
         .url(i18n.t('errors.badUrl'))
         .notOneOf(state.feeds.map((feed) => feed.url.trim()), i18n.t('errors.duplicate')),
     });
