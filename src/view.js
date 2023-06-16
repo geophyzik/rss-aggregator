@@ -146,6 +146,5 @@ export default (elements, state, i18n) => {
         break;
     }
   });
-
   return watchedState;
 };

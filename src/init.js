@@ -69,12 +69,11 @@ export default async () => {
           });
           state.posts = [...state.posts, ...newPost];
 
-          watchedState.form.processState = 'work';
+          watchedState.form.processState = 'success';
           state.form.processState = 'chill';
         })
         .catch((e) => {
           // state.form.errors = 'Ресурс не содержит валидный RSS';
-          // watchedState.form.validState = 'invalid';
           throw e;
         });
     });
@@ -123,7 +122,6 @@ export default async () => {
         state.form.errors = e.errors;
         watchedState.form.validState = 'invalid';
         state.form.processState = 'chill';
-        e.message = 'validate error';
         throw e;
       });
   });
@@ -139,7 +137,7 @@ export default async () => {
         break;
       case 'A':
         state.UIstate.viewedPostsId = [...state.UIstate.viewedPostsId, ...idLatest];
-        watchedState.form.processState = 'work';
+        watchedState.form.processState = 'success';
         state.form.processState = 'chill';
         break;
       default:
