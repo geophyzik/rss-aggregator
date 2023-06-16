@@ -1,6 +1,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/a80b5e2712fcb8741905/maintainability)](https://codeclimate.com/github/Scampik/frontend-project-11/maintainability)
 [![Actions Status](https://github.com/Scampik/frontend-project-46/workflows/hexlet-check/badge.svg)](https://github.com/Scampik/frontend-project-11/actions)
 [![lint and test](https://github.com/Scampik/frontend-project-46/actions/workflows/main.yml/badge.svg)](https://github.com/Scampik/frontend-project-11/actions/workflows/main.yml)
+[![hexlet-check](https://github.com/Scampik/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Scampik/frontend-project-11/actions/workflows/hexlet-check.yml)
 
 News aggregator! 🚀 (RSS reader)
 ---

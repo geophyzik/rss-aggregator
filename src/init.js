@@ -73,7 +73,6 @@ export default async () => {
           state.form.processState = 'chill';
         })
         .catch((e) => {
-          // state.form.errors = 'Ресурс не содержит валидный RSS';
           throw e;
         });
     });
@@ -113,7 +112,12 @@ export default async () => {
             checkUpdatePosts();                                       // refresh post function
           })
           .catch((e) => {
-            state.form.errors = 'Ресурс не содержит валидный RSS';
+            if (e.message === 'Network Error') {
+              state.form.errors = i18n.t('errors.networkProblem');
+            }
+            if (e.message === 'unableToParse') {
+              state.form.errors = i18n.t('errors.invalidRSS');
+            }
             watchedState.form.validState = 'invalid';
             throw e;
           });
