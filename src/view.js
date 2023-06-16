@@ -93,9 +93,8 @@ const renderState = (elements, state, i18n) => {
     invalidFeedback.classList.remove('text-danger');
     invalidFeedback.classList.add('text-success');
     invalidFeedback.textContent = i18n.t('success');
+    elements.rssForm.reset();
   }
-
-  elements.rssForm.reset();
   elements.input.focus();
 };
 

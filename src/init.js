@@ -97,8 +97,8 @@ export default async () => {
         watchedState.form.processState = 'processing';
         axios.get(completionURL(link))
           .then((response) => {
-            watchedState.form.validState = 'valid';
             const data = parserRSS(response);
+            watchedState.form.validState = 'valid';
             data.feed.id = generateId();
             data.posts.forEach((el) => {
               // eslint-disable-next-line no-param-reassign
