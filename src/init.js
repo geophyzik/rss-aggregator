@@ -109,7 +109,7 @@ export default async () => {
             watchedState.form.processState = 'success';
             state.form.processState = 'chill';
             // eslint-disable-next-line no-multi-spaces
-            // checkUpdatePosts();                                       // refresh post function
+            checkUpdatePosts();                                       // refresh post function
           })
           .catch((e) => {
             if (e.message === 'Network Error') {

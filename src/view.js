@@ -138,7 +138,7 @@ export default (elements, state, i18n) => {
           mainButton.disabled = false;
         }
         if (state.form.processState === 'processing') {
-          // mainButton.disabled = true;
+          mainButton.disabled = true;
         }
         break;
       default:
