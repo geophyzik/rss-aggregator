@@ -60,7 +60,7 @@ export default async () => {
     state.feeds.forEach((eachFeed) => {
       axios.get(completionURL(eachFeed.url))
         .then((response) => {
-          const newData = parserRSS(response);
+          const newData = parserRSS(response, eachFeed.url);
           // eslint-disable-next-line max-len
           const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
           newPost.forEach((el) => {
@@ -97,7 +97,7 @@ export default async () => {
         watchedState.form.processState = 'processing';
         axios.get(completionURL(link))
           .then((response) => {
-            const data = parserRSS(response);
+            const data = parserRSS(response, link);
             watchedState.form.validState = 'valid';
             data.feed.id = generateId();
             data.posts.forEach((el) => {
