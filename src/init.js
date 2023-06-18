@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
 import watch from './view.js';
-import ru from './locales/ru';
+import ru from './locales/ru.mjs';
 import parserRSS from './parserRSS.js';
 
 export default async () => {
@@ -42,10 +42,13 @@ export default async () => {
   };
 
   const completionURL = (link) => {
-    const allOrigin = 'https://allorigins.hexlet.app/get?disableCache=true&url=';
-    const encode = encodeURIComponent(link);
-    return `${allOrigin}+${encode}`;
-  };
+    let url = new URL('https://allorigins.hexlet.app/get');
+    url.searchParams.set('disableCache', 'true');
+    url.searchParams.set('url', link);
+    url = url.toString();
+    console.log(url)
+    return url
+    }
 
   const generateId = (() => {
     let num = 0;
@@ -60,7 +63,7 @@ export default async () => {
     state.feeds.forEach((eachFeed) => {
       axios.get(completionURL(eachFeed.url))
         .then((response) => {
-          const newData = parserRSS(response, eachFeed.url);
+          const newData = parserRSS(response);
           // eslint-disable-next-line max-len
           const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
           newPost.forEach((el) => {
@@ -86,6 +89,7 @@ export default async () => {
     const formData = new FormData(event.target);
     const link = formData.get('url');
 
+    console.log(link)
     const schema = yup.object().shape({
       link: yup.string().required().trim()
         .url(i18n.t('errors.badUrl'))
@@ -97,7 +101,7 @@ export default async () => {
         watchedState.form.processState = 'processing';
         axios.get(completionURL(link))
           .then((response) => {
-            const data = parserRSS(response, link);
+            const data = parserRSS(response);
             watchedState.form.validState = 'valid';
             data.feed.id = generateId();
             data.posts.forEach((el) => {

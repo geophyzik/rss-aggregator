@@ -5,3 +5,7 @@ node_modules/
 dist
 assets
 index_test.html
+/test-results/
+/playwright-report/
+/playwright/.cache/
+

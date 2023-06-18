@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "My webpack project",
   "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "author": "ildar Sakhautdinov",
   "license": "ISC",
+  "type": "module",
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/eslint-parser": "^7.21.3",
     "@babel/preset-env": "^7.21.4",
+    "@playwright/test": "^1.35.1",
     "@webpack-cli/generators": "^3.0.2",
     "babel-loader": "^9.1.2",
     "css-loader": "^6.8.1",
@@ -28,6 +28,7 @@
     "style-loader": "^3.3.3",
     "webpack": "^5.80.0",
     "webpack-cli": "^5.0.2",
+    "terser-webpack-plugin": "^5.3.9",
     "webpack-dev-server": "^4.13.3"
   },
   "dependencies": {
@@ -35,7 +36,6 @@
     "bootstrap": "^5.3.0",
     "i18next": "^22.5.1",
     "on-change": "^4.0.2",
-    "terser-webpack-plugin": "^5.3.9",
     "yup": "^1.2.0"
   }
 }
