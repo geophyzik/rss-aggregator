@@ -46,7 +46,7 @@ export default async () => {
     url.searchParams.set('disableCache', 'true');
     url.searchParams.set('url', link);
     url = url.toString();
-    console.log(url)
+    // console.log(url)
     return url
     }
 
@@ -74,12 +74,16 @@ export default async () => {
 
           watchedState.form.processState = 'success';
           state.form.processState = 'chill';
+          console.log('update done', eachFeed.url)
+          setTimeout(checkUpdatePosts, 10000);
         })
+        
         .catch((e) => {
           console.log(e.message);
         });
     });
-    setTimeout(checkUpdatePosts, 5000);
+    console.log('done???')
+   
   };
 
   elements.rssForm.addEventListener('submit', async (event) => {
@@ -89,7 +93,7 @@ export default async () => {
     const formData = new FormData(event.target);
     const link = formData.get('url');
 
-    console.log(link)
+    // console.log(link)
     const schema = yup.object().shape({
       link: yup.string().required().trim()
         .url(i18n.t('errors.badUrl'))
@@ -113,7 +117,8 @@ export default async () => {
             watchedState.form.processState = 'success';
             state.form.processState = 'chill';
             // eslint-disable-next-line no-multi-spaces
-            checkUpdatePosts();                                       // refresh post function
+            checkUpdatePosts();       
+            // console.log(state)                                // refresh post function
           })
           .catch((e) => {
             if (e.message === 'Network Error') {
@@ -136,15 +141,17 @@ export default async () => {
 
   elements.containers.postsContainer.addEventListener('click', (e) => {
     const click = e.target;
-    const idLatest = click.dataset.id;
+    const idLatest = Number(click.dataset.id);
+    console.log(idLatest)
+    console.log('idLatest')
     switch (click.tagName) {
       case 'BUTTON':
-        state.UIstate.viewedPostsId = [...state.UIstate.viewedPostsId, ...idLatest];
+        state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'openModalWindow';
         state.form.processState = 'chill';
         break;
       case 'A':
-        state.UIstate.viewedPostsId = [...state.UIstate.viewedPostsId, ...idLatest];
+        state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'success';
         state.form.processState = 'chill';
         break;

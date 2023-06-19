@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import path from 'path';
+// import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 // import TerserPlugin from 'terser-webpack-plugin';
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -57,6 +57,14 @@ const config = {
   // },
 };
 
+// module.exports = () => {
+//   if (isProduction) {
+//     config.mode = 'production';
+//   } else {
+//     config.mode = 'development';
+//   }
+//   return config;
+// };
 export default () => {
   if (isProduction) {
     config.mode = 'production';
