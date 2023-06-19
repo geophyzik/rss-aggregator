@@ -50,8 +50,8 @@ const getResponseHandler = (page) => (currentRssUrl, data) => (
       console.error('Expect proxified url to have "url" param with correct url');
       return route.fulfill({ status: 500 });
     }
-    console.log(data)
-    console.log(JSON.stringify({ contents: data }))
+    // console.log(data)
+    // console.log(JSON.stringify({ contents: data }))
 
     return route.fulfill({
       status: 200,

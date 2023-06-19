@@ -47,7 +47,6 @@ export default async () => {
     url.searchParams.set('disableCache', 'true');
     url.searchParams.set('url', link);
     url = url.toString();
-    // console.log(url)
     return url
     }
 
@@ -64,7 +63,7 @@ export default async () => {
     state.feeds.forEach((eachFeed) => {
       axios.get(completionURL(eachFeed.url))
         .then((response) => {
-          const newData = parserRSS(response);
+          const newData = parserRSS(response, eachFeed.url);
           // eslint-disable-next-line max-len
           const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
           newPost.forEach((el) => {
@@ -76,7 +75,6 @@ export default async () => {
           watchedState.form.processState = 'success';
           state.form.processState = 'chill';
         })
-        
         .catch((e) => {
           console.log(e.message);
         });
@@ -91,7 +89,6 @@ export default async () => {
     const formData = new FormData(event.target);
     const link = formData.get('url');
 
-    // console.log(link)
     const schema = yup.object().shape({
       link: yup.string().required().trim()
         .url(i18n.t('errors.badUrl'))
@@ -103,7 +100,7 @@ export default async () => {
         watchedState.form.processState = 'processing';
         axios.get(completionURL(link))
           .then((response) => {
-            const data = parserRSS(response);
+            const data = parserRSS(response, link);
             watchedState.form.validState = 'valid';
             data.feed.id = generateId();
             data.posts.forEach((el) => {
