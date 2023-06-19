@@ -26,6 +26,7 @@ export default async () => {
     posts: [],
 
     UIstate: {
+      updateStatus: 'false',
       viewedPostsId: [],
     },
   };
@@ -74,16 +75,13 @@ export default async () => {
 
           watchedState.form.processState = 'success';
           state.form.processState = 'chill';
-          console.log('update done', eachFeed.url)
-          setTimeout(checkUpdatePosts, 10000);
         })
         
         .catch((e) => {
           console.log(e.message);
         });
     });
-    console.log('done???')
-   
+    setTimeout(checkUpdatePosts, 5000);
   };
 
   elements.rssForm.addEventListener('submit', async (event) => {
@@ -117,8 +115,10 @@ export default async () => {
             watchedState.form.processState = 'success';
             state.form.processState = 'chill';
             // eslint-disable-next-line no-multi-spaces
-            checkUpdatePosts();       
-            // console.log(state)                                // refresh post function
+            if (state.UIstate.updateStatus === 'false') {
+              state.UIstate.updateStatus = 'true';
+              checkUpdatePosts();
+            }
           })
           .catch((e) => {
             if (e.message === 'Network Error') {
