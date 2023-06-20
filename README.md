@@ -17,5 +17,5 @@ How To Install?
 
 How Its Work?:
 ------------------------------------------------------
-<a href="https://frontend-project-11-iota.vercel.app/" target="_blank">RSS reader site example</a>
+<a href="https://frontend-project-11-iota.vercel.app/" target=_blank>RSS reader site example</a>
 ------------------------------------------------------
