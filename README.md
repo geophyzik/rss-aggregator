@@ -2,20 +2,20 @@
 [![Actions Status](https://github.com/Scampik/frontend-project-46/workflows/hexlet-check/badge.svg)](https://github.com/Scampik/frontend-project-11/actions)
 [![hexlet-check](https://github.com/Scampik/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Scampik/frontend-project-11/actions/workflows/hexlet-check.yml)
 
-News aggregator! 🚀 (RSS reader)
+News aggregator! 🚀 (RSS reader) <img align="right" src="https://cdn-icons-png.flaticon.com/512/124/124033.png" alt="Girl in a jacket" style="width:150px;height:130px;">
 ---
 
-This project has been created using **webpack-cli**, you can now run
+RSS reader - a service for aggregating RSS feeds, with the help of convenient reading of sources, such as blogs. It allows you to add a large number of RSS feeds, updates them itself and adds new entries to the general feed.
 
 How To Install? 
 ---
 <ul>
 <li>git clone git@github.com:Scampik/frontend-project-11.git</li>
 <li>make install</li>
-<li>npm run build</li>
+<li>make build</li>
 </ul>
 
 How Its Work?:
 ------------------------------------------------------
- https://frontend-project-11-iota.vercel.app/
+[RSS reader site example](https://frontend-project-11-iota.vercel.app/)
 ------------------------------------------------------
