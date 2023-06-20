@@ -1,31 +1,29 @@
 /* eslint-disable import/no-extraneous-dependencies */
-// import path from 'path';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-// import TerserPlugin from 'terser-webpack-plugin';
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const TerserPlugin = require('terser-webpack-plugin');
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 const config = {
-  entry: './src/index.js', //
-  // output: {
-  //   path: './dist',
-  // },
+  entry: path.resolve(__dirname, './src/index.js'),
+  output: {
+    path: path.resolve(__dirname, './dist'),
+  },
   devServer: {
     open: true,
     host: 'localhost',
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'index.html',  //path.resolve(__dirname, 'index.html'),
+      template: path.resolve(__dirname, 'index.html'),
     }),
   ],
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader', 'postcss-loader'] 
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.scss$/,
@@ -39,33 +37,15 @@ const config = {
         test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
         use: 'file-loader',
       },
-      // {
-      //   test: /\.js$/,
-      //   exclude: /node_modules/,
-      //   use: {
-      //     loader: 'babel-loader',
-      //     options: {
-      //       presets: ['@babel/preset-env'],
-      //     },
-      //   },
-      // },
     ],
   },
-  // optimization: {
-  //   minimize: true,
-  //   minimizer: [new TerserPlugin()],
-  // },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+  },
 };
 
-// module.exports = () => {
-//   if (isProduction) {
-//     config.mode = 'production';
-//   } else {
-//     config.mode = 'development';
-//   }
-//   return config;
-// };
-export default () => {
+module.exports = () => {
   if (isProduction) {
     config.mode = 'production';
   } else {
@@ -73,4 +53,3 @@ export default () => {
   }
   return config;
 };
-// export default config;

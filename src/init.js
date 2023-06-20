@@ -47,8 +47,8 @@ export default async () => {
     url.searchParams.set('disableCache', 'true');
     url.searchParams.set('url', link);
     url = url.toString();
-    return url
-    }
+    return url;
+  };
 
   const generateId = (() => {
     let num = 0;
@@ -139,8 +139,6 @@ export default async () => {
   elements.containers.postsContainer.addEventListener('click', (e) => {
     const click = e.target;
     const idLatest = Number(click.dataset.id);
-    console.log(idLatest)
-    console.log('idLatest')
     switch (click.tagName) {
       case 'BUTTON':
         state.UIstate.viewedPostsId.push(idLatest);

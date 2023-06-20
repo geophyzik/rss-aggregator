@@ -34,8 +34,7 @@ const renderPosts = (elements, state, i18n) => {
 
     postsList.append(post);
     post.append(postTitle, postButton);
-
-    if (state.UIstate.viewedPostsId.includes(`${element.id}`)) {
+    if (state.UIstate.viewedPostsId.includes(element.id)) {
       postTitle.classList.remove('fw-bold');
       postTitle.classList.add('fw-normal', 'link-secondary');
     }
@@ -102,7 +101,6 @@ const modalWindow = (state) => {
   const titleModal = document.querySelector('.modal-title');
   const bodyModal = document.querySelector('.modal-body');
   const btnModal = document.querySelector('.btn-primary');
-  console.log(state.UIstate.viewedPostsId)
   const arrayId = state.UIstate.viewedPostsId;
   const latestId = Number(arrayId[arrayId.length - 1]);
   const postModal = state.posts.filter((post) => post.id === latestId);

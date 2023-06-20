@@ -6,7 +6,6 @@
   "scripts": {},
   "author": "ildar Sakhautdinov",
   "license": "ISC",
-  "type": "module",
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/eslint-parser": "^7.21.3",
