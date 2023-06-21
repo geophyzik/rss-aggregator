@@ -17,7 +17,6 @@ const renderPosts = (elements, state, i18n) => {
     const post = document.createElement('li');
     const postTitle = document.createElement('a');
     const postButton = document.createElement('button');
-
     post.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     postTitle.setAttribute('href', element.link);
     postTitle.classList.add('fw-bold');

@@ -13,7 +13,7 @@ export default (response, link) => {
       posts.push({
         title: el.querySelector('title').textContent,
         description: el.querySelector('description').textContent,
-        link: el.querySelector('link').nextSibling.textContent.trim(),
+        link: el.querySelector('link').textContent.trim(),
       });
     });
     return { feed, posts };
