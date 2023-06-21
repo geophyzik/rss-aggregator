@@ -17,5 +17,7 @@ How To Install?
 
 How Its Work?:
 ------------------------------------------------------
-<a href="https://frontend-project-11-iota.vercel.app/" target=_blank>RSS reader site example</a>
-------------------------------------------------------
+<img align="left" src="https://media4.giphy.com/media/68DraxVN5AdpiZZ6bz/giphy.gif?cid=ecf05e47mh6biy3hhtkwzj34qq6kh1a5b0tnjueijtvj27q4&ep=v1_gifs_search&rid=giphy.gif&ct=g" alt="Girl in a jacket" style="width:230px;height:130px;">
+
+# <a href="https://frontend-project-11-iota.vercel.app/" size="20" target=_blank>RSS reader site example</a>
+
