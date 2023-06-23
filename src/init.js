@@ -3,10 +3,10 @@ import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
 import watch from './view.js';
-import ru from './locales/ru.mjs';
+import ru from './locales/ru.js';
 import parserRSS from './parserRSS.js';
 
-export default async () => {
+export default () => {
   const defaultLanguage = 'ru';
   const i18n = i18next.createInstance();
   i18n.init({
@@ -73,7 +73,7 @@ export default async () => {
           state.posts = [...state.posts, ...newPost];
 
           watchedState.form.processState = 'success';
-          state.form.processState = 'chill';
+          state.form.processState = 'filling';
         })
         .catch((e) => {
           console.log(e.message);
@@ -84,8 +84,7 @@ export default async () => {
 
   elements.rssForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    state.form.processState = 'chill';
-    state.form.validState = 'none';
+    state.form.processState = 'filling';
     const formData = new FormData(event.target);
     const link = formData.get('url');
 
@@ -94,7 +93,7 @@ export default async () => {
         .url(i18n.t('errors.badUrl'))
         .notOneOf(state.feeds.map((feed) => feed.url.trim()), i18n.t('errors.duplicate')),
     });
-
+    watchedState.form.validState = 'validity';
     schema.validate({ link })
       .then(() => {
         watchedState.form.processState = 'processing';
@@ -110,7 +109,7 @@ export default async () => {
             state.feeds.push(data.feed);
             state.posts = [...state.posts, ...data.posts];
             watchedState.form.processState = 'success';
-            state.form.processState = 'chill';
+            state.form.processState = 'filling';
             // eslint-disable-next-line no-multi-spaces
             if (state.UIstate.updateStatus === 'false') {
               state.UIstate.updateStatus = 'true';
@@ -143,12 +142,12 @@ export default async () => {
       case 'BUTTON':
         state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'openModalWindow';
-        state.form.processState = 'chill';
+        state.form.processState = 'filling';
         break;
       case 'A':
         state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'success';
-        state.form.processState = 'chill';
+        state.form.processState = 'filling';
         break;
       default:
         break;

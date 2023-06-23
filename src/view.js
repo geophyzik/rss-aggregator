@@ -93,6 +93,15 @@ const renderState = (elements, state, i18n) => {
     invalidFeedback.textContent = i18n.t('success');
     elements.rssForm.reset();
   }
+
+  if (state.form.validState === 'validity') {
+    const invalidFeedback = elements.feedback;
+    elements.input.classList.remove('is-invalid');
+    elements.input.classList.remove('is-valid');
+    invalidFeedback.classList.remove('text-danger');
+    invalidFeedback.classList.remove('text-success');
+    invalidFeedback.textContent = '';
+  }
   elements.input.focus();
 };
 
@@ -119,23 +128,28 @@ const modalWindow = (state) => {
 export default (elements, state, i18n) => {
   const watchedState = onChange(state, (path) => {
     const mainButton = elements.mainBtn;
+    const mainInput = elements.input;
     switch (path) {
       case 'form.validState':
         renderState(elements, state, i18n);
         mainButton.disabled = false;
+        mainInput.disabled = false;
         break;
       case 'form.processState':
         if (state.form.processState === 'success') {
           renderFeeds(elements, state, i18n);
           renderPosts(elements, state, i18n);
           mainButton.disabled = false;
+          mainInput.disabled = false;
         }
         if (state.form.processState === 'openModalWindow') {
           modalWindow(state);
           mainButton.disabled = false;
+          mainInput.disabled = false;
         }
         if (state.form.processState === 'processing') {
           mainButton.disabled = true;
+          mainInput.disabled = true;
         }
         break;
       default:
