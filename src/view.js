@@ -81,7 +81,7 @@ const renderState = (elements, state, i18n) => {
     elements.input.classList.add('is-invalid');
     validFeedback.classList.remove('text-success');
     validFeedback.classList.add('text-danger');
-    validFeedback.textContent = state.form.errors;
+    validFeedback.textContent = i18n.t(state.form.errors);
   }
 
   if (state.form.validState === 'valid') {

@@ -18,7 +18,7 @@ export default () => {
   const state = {
     form: {
       processState: '',
-      errors: '',
+      errors: null,
       validState: '',
     },
 
@@ -52,8 +52,10 @@ export default () => {
 
   const generateId = (() => {
     let num = 0;
-    // eslint-disable-next-line no-plusplus
-    const func = () => ++num;
+    const func = () => {
+      num += 1;
+      return num;
+    };
     return func;
   })();
 
@@ -74,11 +76,13 @@ export default () => {
 
           watchedState.form.processState = 'success';
           state.form.processState = 'filling';
+          // console.log('update', eachFeed);  //
         })
         .catch((e) => {
           console.log(e.message);
         });
     });
+    // console.log('done ');  //
     setTimeout(checkUpdatePosts, 5000);
   };
 
@@ -90,8 +94,8 @@ export default () => {
 
     const schema = yup.object().shape({
       link: yup.string().required().trim()
-        .url(i18n.t('errors.badUrl'))
-        .notOneOf(state.feeds.map((feed) => feed.url.trim()), i18n.t('errors.duplicate')),
+        .url('errors.badUrl')
+        .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
     });
     watchedState.form.validState = 'validity';
     schema.validate({ link })
@@ -115,13 +119,14 @@ export default () => {
               state.UIstate.updateStatus = 'true';
               checkUpdatePosts();
             }
+            // console.log(state);    //
           })
           .catch((e) => {
             if (e.message === 'Network Error') {
-              state.form.errors = i18n.t('errors.networkProblem');
+              state.form.errors = 'errors.networkProblem';
             }
             if (e.message === 'unableToParse') {
-              state.form.errors = i18n.t('errors.invalidRSS');
+              state.form.errors = 'errors.invalidRSS';
             }
             watchedState.form.validState = 'invalid';
             throw e;
