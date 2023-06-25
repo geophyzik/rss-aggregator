@@ -17,9 +17,9 @@ export default () => {
 
   const state = {
     form: {
-      processState: '',
+      processState: 'filling',
       errors: null,
-      validState: '',
+      validState: 'validity',
     },
 
     feeds: [],
@@ -68,11 +68,8 @@ export default () => {
           const newData = parserRSS(response, eachFeed.url);
           // eslint-disable-next-line max-len
           const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
-          newPost.forEach((el) => {
-            // eslint-disable-next-line no-param-reassign
-            el.id = eachFeed.id;
-          });
-          state.posts = [...state.posts, ...newPost];
+          const updatedPost = newPost.map((el) => ({ ...el, id: generateId() }));
+          state.posts = [...state.posts, ...updatedPost];
 
           watchedState.form.processState = 'success';
           state.form.processState = 'filling';
@@ -106,20 +103,16 @@ export default () => {
             const data = parserRSS(response, link);
             watchedState.form.validState = 'valid';
             data.feed.id = generateId();
-            data.posts.forEach((el) => {
-              // eslint-disable-next-line no-param-reassign
-              el.id = generateId();
-            });
+            const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
             state.feeds.push(data.feed);
-            state.posts = [...state.posts, ...data.posts];
+            state.posts = [...state.posts, ...postWithId];
             watchedState.form.processState = 'success';
-            state.form.processState = 'filling';
             // eslint-disable-next-line no-multi-spaces
             if (state.UIstate.updateStatus === 'false') {
               state.UIstate.updateStatus = 'true';
               checkUpdatePosts();
             }
-            // console.log(state);    //
+            console.log(state);    //
           })
           .catch((e) => {
             if (e.message === 'Network Error') {
@@ -135,9 +128,9 @@ export default () => {
       .catch((e) => {
         state.form.errors = e.errors;
         watchedState.form.validState = 'invalid';
-        state.form.processState = 'chill';
         throw e;
       });
+    state.form.processState = 'filling';
   });
 
   elements.containers.postsContainer.addEventListener('click', (e) => {
