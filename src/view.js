@@ -151,6 +151,10 @@ export default (elements, state, i18n) => {
           mainButton.disabled = true;
           mainInput.disabled = true;
         }
+        if (state.form.processState === 'filling') {
+          mainButton.disabled = false;
+          mainInput.disabled = false;
+        }
         break;
       default:
         break;

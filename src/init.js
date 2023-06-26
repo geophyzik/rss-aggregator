@@ -62,30 +62,28 @@ export default () => {
   const watchedState = watch(elements, state, i18n);
 
   const checkUpdatePosts = () => {
-    state.feeds.forEach((eachFeed) => {
-      axios.get(completionURL(eachFeed.url))
-        .then((response) => {
-          const newData = parserRSS(response, eachFeed.url);
-          // eslint-disable-next-line max-len
-          const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
-          const updatedPost = newPost.map((el) => ({ ...el, id: generateId() }));
+    const promises = state.feeds.map((eachFeed) => axios.get(completionURL(eachFeed.url))
+      .then((response) => {
+        const newData = parserRSS(response, eachFeed.url);
+        // eslint-disable-next-line max-len
+        const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
+        const updatedPost = newPost.map((el) => ({ ...el, id: generateId() }));
+        if (updatedPost.length > 0) {
           state.posts = [...state.posts, ...updatedPost];
-
-          watchedState.form.processState = 'success';
-          state.form.processState = 'filling';
-          // console.log('update', eachFeed);  //
-        })
-        .catch((e) => {
-          console.log(e.message);
-        });
-    });
-    // console.log('done ');  //
-    setTimeout(checkUpdatePosts, 5000);
+        }
+        watchedState.form.processState = 'success';
+        return Promise.resolve();
+      })
+      .catch((e) => {
+        console.log(e.message);
+        return Promise.resolve();
+      }));
+    watchedState.form.processState = 'filling';
+    Promise.allSettled(promises).then(() => setTimeout(checkUpdatePosts, 5000));
   };
 
   elements.rssForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    state.form.processState = 'filling';
     const formData = new FormData(event.target);
     const link = formData.get('url');
 
@@ -134,15 +132,14 @@ export default () => {
       case 'BUTTON':
         state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'openModalWindow';
-        state.form.processState = 'filling';
         break;
       case 'A':
         state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'success';
-        state.form.processState = 'filling';
         break;
       default:
         break;
     }
+    watchedState.form.processState = 'filling';
   });
 };
