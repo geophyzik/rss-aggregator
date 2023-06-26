@@ -107,20 +107,14 @@ export default () => {
             state.feeds.push(data.feed);
             state.posts = [...state.posts, ...postWithId];
             watchedState.form.processState = 'success';
-            // eslint-disable-next-line no-multi-spaces
             if (state.UIstate.updateStatus === 'false') {
               state.UIstate.updateStatus = 'true';
               checkUpdatePosts();
             }
-            console.log(state);    //
+            // console.log(state);    //
           })
           .catch((e) => {
-            if (e.message === 'Network Error') {
-              state.form.errors = 'errors.networkProblem';
-            }
-            if (e.message === 'unableToParse') {
-              state.form.errors = 'errors.invalidRSS';
-            }
+            state.form.errors = axios.isAxiosError(e) ? 'errors.networkProblem' : 'errors.invalidRSS';
             watchedState.form.validState = 'invalid';
             throw e;
           });
