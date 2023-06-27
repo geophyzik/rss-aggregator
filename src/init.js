@@ -79,7 +79,8 @@ export default () => {
         return Promise.resolve();
       }));
     watchedState.form.processState = 'filling';
-    Promise.allSettled(promises).then(() => setTimeout(checkUpdatePosts, 5000));
+    Promise.allSettled(promises).then(() => {
+      setTimeout(checkUpdatePosts, 5000)});
   };
 
   elements.rssForm.addEventListener('submit', async (event) => {
@@ -92,7 +93,9 @@ export default () => {
         .url('errors.badUrl')
         .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
     });
+
     watchedState.form.validState = 'validity';
+
     schema.validate({ link })
       .then(() => {
         watchedState.form.processState = 'processing';
@@ -109,7 +112,6 @@ export default () => {
               state.UIstate.updateStatus = 'true';
               checkUpdatePosts();
             }
-            // console.log(state);    //
           })
           .catch((e) => {
             state.form.errors = axios.isAxiosError(e) ? 'errors.networkProblem' : 'errors.invalidRSS';
@@ -122,21 +124,22 @@ export default () => {
         watchedState.form.validState = 'invalid';
         throw e;
       });
-    state.form.processState = 'filling';
+    watchedState.form.processState = 'filling';
   });
 
   elements.containers.postsContainer.addEventListener('click', (e) => {
     const click = e.target;
-    const idLatest = Number(click.dataset.id);
+    const set = new Set(state.UIstate.viewedPostsId);
+    set.add(Number(click.dataset.id));
+    state.UIstate.viewedPostsId = set;
     switch (click.tagName) {
+      case 'A':
+        watchedState.form.processState = 'openLink';
+        break;
       case 'BUTTON':
-        state.UIstate.viewedPostsId.push(idLatest);
         watchedState.form.processState = 'openModalWindow';
         break;
-      case 'A':
-        state.UIstate.viewedPostsId.push(idLatest);
-        watchedState.form.processState = 'success';
-        break;
+
       default:
         break;
     }

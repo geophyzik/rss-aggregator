@@ -33,7 +33,9 @@ const renderPosts = (elements, state, i18n) => {
 
     postsList.append(post);
     post.append(postTitle, postButton);
-    if (state.UIstate.viewedPostsId.includes(element.id)) {
+
+    const viewedPosts = new Set(state.UIstate.viewedPostsId);
+    if (viewedPosts.has(element.id)) {
       postTitle.classList.remove('fw-bold');
       postTitle.classList.add('fw-normal', 'link-secondary');
     }
@@ -109,10 +111,16 @@ const modalWindow = (state) => {
   const titleModal = document.querySelector('.modal-title');
   const bodyModal = document.querySelector('.modal-body');
   const btnModal = document.querySelector('.btn-primary');
-  const arrayId = state.UIstate.viewedPostsId;
-  const latestId = Number(arrayId[arrayId.length - 1]);
-  const postModal = state.posts.filter((post) => post.id === latestId);
-  const { title, description, link } = postModal[0];
+  const viewedPosts = new Set(state.UIstate.viewedPostsId);
+  const latestId = Array.from(viewedPosts).pop();
+  const postModal = state.posts.reduce((acc, post) => {
+    if (post.id === latestId) {
+      Object.assign(acc, post);
+    }
+    return acc;
+  }, {});
+
+  const { title, description, link } = postModal;
   const postElement = document.querySelector(`[data-id='${latestId}']`);
 
   if (postElement) {
@@ -144,8 +152,6 @@ export default (elements, state, i18n) => {
         }
         if (state.form.processState === 'openModalWindow') {
           modalWindow(state);
-          mainButton.disabled = false;
-          mainInput.disabled = false;
         }
         if (state.form.processState === 'processing') {
           mainButton.disabled = true;
@@ -154,6 +160,9 @@ export default (elements, state, i18n) => {
         if (state.form.processState === 'filling') {
           mainButton.disabled = false;
           mainInput.disabled = false;
+        }
+        if (state.form.processState === 'openLink') {
+          renderPosts(elements, state, i18n);
         }
         break;
       default:
