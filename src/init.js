@@ -80,7 +80,8 @@ export default () => {
       }));
     watchedState.form.processState = 'filling';
     Promise.allSettled(promises).then(() => {
-      setTimeout(checkUpdatePosts, 5000)});
+      setTimeout(checkUpdatePosts, 5000);
+    });
   };
 
   elements.rssForm.addEventListener('submit', async (event) => {
