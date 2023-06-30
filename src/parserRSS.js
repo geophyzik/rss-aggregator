@@ -1,5 +1,7 @@
 export default (response, link) => {
-  const parseData = new DOMParser().parseFromString(response.data.contents, 'text/xml');
+  const parser = new DOMParser();
+  const data = response.data.contents;
+  const parseData = parser.parseFromString(data, 'text/xml');
   try {
     const feed = {
       title: parseData.querySelector('title').textContent,

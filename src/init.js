@@ -84,7 +84,7 @@ export default () => {
     });
   };
 
-  elements.rssForm.addEventListener('submit', async (event) => {
+  elements.rssForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const link = formData.get('url');
