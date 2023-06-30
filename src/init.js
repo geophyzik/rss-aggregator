@@ -13,137 +13,138 @@ export default () => {
     lng: defaultLanguage,
     debug: true,
     resources: { ru },
-  });
+  })
+    .then(() => {
+      const state = {
+        form: {
+          processState: 'filling',
+          errors: null,
+          validState: 'validity',
+        },
 
-  const state = {
-    form: {
-      processState: 'filling',
-      errors: null,
-      validState: 'validity',
-    },
+        feeds: [],
+        posts: [],
 
-    feeds: [],
-    posts: [],
+        UIstate: {
+          updateStatus: 'false',
+          viewedPostsId: [],
+        },
+      };
 
-    UIstate: {
-      updateStatus: 'false',
-      viewedPostsId: [],
-    },
-  };
+      const elements = {
+        rssForm: document.querySelector('.rss-form'),
+        mainBtn: document.querySelector('[type="submit"]'),
+        input: document.querySelector('input'),
+        feedback: document.querySelector('.feedback'),
+        containers: {
+          postsContainer: document.querySelector('.container-xxl > div > .posts'),
+          feedsContainer: document.querySelector('.container-xxl > div > .feeds'),
+        },
+      };
 
-  const elements = {
-    rssForm: document.querySelector('.rss-form'),
-    mainBtn: document.querySelector('[type="submit"]'),
-    input: document.querySelector('input'),
-    feedback: document.querySelector('.feedback'),
-    containers: {
-      postsContainer: document.querySelector('.container-xxl > div > .posts'),
-      feedsContainer: document.querySelector('.container-xxl > div > .feeds'),
-    },
-  };
+      const completionURL = (link) => {
+        let url = new URL('https://allorigins.hexlet.app/get');
+        url.searchParams.set('disableCache', 'true');
+        url.searchParams.set('url', link);
+        url = url.toString();
+        return url;
+      };
 
-  const completionURL = (link) => {
-    let url = new URL('https://allorigins.hexlet.app/get');
-    url.searchParams.set('disableCache', 'true');
-    url.searchParams.set('url', link);
-    url = url.toString();
-    return url;
-  };
+      const generateId = (() => {
+        let num = 0;
+        const func = () => {
+          num += 1;
+          return num;
+        };
+        return func;
+      })();
 
-  const generateId = (() => {
-    let num = 0;
-    const func = () => {
-      num += 1;
-      return num;
-    };
-    return func;
-  })();
+      const watchedState = watch(elements, state, i18n);
 
-  const watchedState = watch(elements, state, i18n);
-
-  const checkUpdatePosts = () => {
-    const promises = state.feeds.map((eachFeed) => axios.get(completionURL(eachFeed.url))
-      .then((response) => {
-        const newData = parserRSS(response, eachFeed.url);
-        // eslint-disable-next-line max-len
-        const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
-        const updatedPost = newPost.map((el) => ({ ...el, id: generateId() }));
-        if (updatedPost.length > 0) {
-          state.posts = [...state.posts, ...updatedPost];
-        }
-        watchedState.form.processState = 'success';
-        return Promise.resolve();
-      })
-      .catch((e) => {
-        console.log(e.message);
-        return Promise.resolve();
-      }));
-    watchedState.form.processState = 'filling';
-    Promise.allSettled(promises).then(() => {
-      setTimeout(checkUpdatePosts, 5000);
-    });
-  };
-
-  elements.rssForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const link = formData.get('url');
-
-    const schema = yup.object().shape({
-      link: yup.string().required().trim()
-        .url('errors.badUrl')
-        .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
-    });
-
-    watchedState.form.validState = 'validity';
-
-    schema.validate({ link })
-      .then(() => {
-        watchedState.form.processState = 'processing';
-        axios.get(completionURL(link))
+      const checkUpdatePosts = () => {
+        const promises = state.feeds.map((eachFeed) => axios.get(completionURL(eachFeed.url))
           .then((response) => {
-            const data = parserRSS(response, link);
-            watchedState.form.validState = 'valid';
-            data.feed.id = generateId();
-            const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
-            state.feeds.push(data.feed);
-            state.posts = [...state.posts, ...postWithId];
-            watchedState.form.processState = 'success';
-            if (state.UIstate.updateStatus === 'false') {
-              state.UIstate.updateStatus = 'true';
-              checkUpdatePosts();
+            const newData = parserRSS(response, eachFeed.url);
+            // eslint-disable-next-line max-len
+            const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
+            const updatedPost = newPost.map((el) => ({ ...el, id: generateId() }));
+            if (updatedPost.length > 0) {
+              state.posts = [...state.posts, ...updatedPost];
             }
+            watchedState.form.processState = 'success';
+            return Promise.resolve();
           })
           .catch((e) => {
-            state.form.errors = axios.isAxiosError(e) ? 'errors.networkProblem' : 'errors.invalidRSS';
+            console.log(e.message);
+            return Promise.resolve();
+          }));
+        watchedState.form.processState = 'filling';
+        Promise.allSettled(promises).then(() => {
+          setTimeout(checkUpdatePosts, 5000);
+        });
+      };
+
+      elements.rssForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const link = formData.get('url');
+
+        const schema = yup.object().shape({
+          link: yup.string().required().trim()
+            .url('errors.badUrl')
+            .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
+        });
+
+        watchedState.form.validState = 'validity';
+
+        schema.validate({ link })
+          .then(() => {
+            watchedState.form.processState = 'processing';
+            axios.get(completionURL(link))
+              .then((response) => {
+                const data = parserRSS(response, link);
+                watchedState.form.validState = 'valid';
+                data.feed.id = generateId();
+                const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
+                state.feeds.push(data.feed);
+                state.posts = [...state.posts, ...postWithId];
+                watchedState.form.processState = 'success';
+                if (state.UIstate.updateStatus === 'false') {
+                  state.UIstate.updateStatus = 'true';
+                  checkUpdatePosts();
+                }
+              })
+              .catch((err) => {
+                state.form.errors = axios.isAxiosError(err) ? 'errors.networkProblem' : 'errors.invalidRSS';
+                watchedState.form.validState = 'invalid';
+                throw err;
+              });
+          })
+          .catch((err) => {
+            state.form.errors = err.errors;
             watchedState.form.validState = 'invalid';
-            throw e;
+            throw err;
           });
-      })
-      .catch((e) => {
-        state.form.errors = e.errors;
-        watchedState.form.validState = 'invalid';
-        throw e;
+        watchedState.form.processState = 'filling';
       });
-    watchedState.form.processState = 'filling';
-  });
 
-  elements.containers.postsContainer.addEventListener('click', (e) => {
-    const click = e.target;
-    const set = new Set(state.UIstate.viewedPostsId);
-    set.add(Number(click.dataset.id));
-    state.UIstate.viewedPostsId = set;
-    switch (click.tagName) {
-      case 'A':
-        watchedState.form.processState = 'openLink';
-        break;
-      case 'BUTTON':
-        watchedState.form.processState = 'openModalWindow';
-        break;
+      elements.containers.postsContainer.addEventListener('click', (e) => {
+        const click = e.target;
+        const set = new Set(state.UIstate.viewedPostsId);
+        set.add(Number(click.dataset.id));
+        state.UIstate.viewedPostsId = set;
+        switch (click.tagName) {
+          case 'A':
+            watchedState.form.processState = 'openLink';
+            break;
+          case 'BUTTON':
+            watchedState.form.processState = 'openModalWindow';
+            break;
 
-      default:
-        break;
-    }
-    watchedState.form.processState = 'filling';
-  });
+          default:
+            break;
+        }
+        watchedState.form.processState = 'filling';
+      });
+    });
 };
