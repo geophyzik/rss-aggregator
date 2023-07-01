@@ -5,6 +5,7 @@ export default {
       duplicate: 'RSS уже существует',
       networkProblem: 'Ошибка сети',
       invalidRSS: 'Ресурс не содержит валидный RSS',
+      defect: 'Что-то пошло не так',
     },
     success: 'RSS успешно загружен',
     lookPost: 'Просмотр',
