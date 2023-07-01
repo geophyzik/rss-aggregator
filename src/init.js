@@ -19,7 +19,7 @@ export default () => {
         form: {
           processState: 'filling',
           errors: null,
-          validState: 'validity',
+          validState: null,
         },
 
         feeds: [],
@@ -27,7 +27,8 @@ export default () => {
 
         UIstate: {
           updateStatus: 'false',
-          viewedPostsId: [],
+          viewedPosts: new Set(),
+          currentPostsId: null,
         },
       };
 
@@ -64,22 +65,21 @@ export default () => {
       const checkUpdatePosts = () => {
         const promises = state.feeds.map((eachFeed) => axios.get(completionURL(eachFeed.url))
           .then((response) => {
-            const newData = parserRSS(response, eachFeed.url);
-            // eslint-disable-next-line max-len
-            const newPost = newData.posts.filter((el) => !state.posts.some((el2) => el2.postName === el.postName));
-            const updatedPost = newPost.map((el) => ({ ...el, id: generateId() }));
+            const getData = parserRSS(response, eachFeed.url);
+            const newData = getData.posts;
+            const oldData = state.posts;
+            const newPosts = newData.filter((e1) => !oldData.some((e2) => e2.title === e1.title));
+            const updatedPost = newPosts.map((el) => ({ ...el, id: generateId() }));
             if (updatedPost.length > 0) {
               state.posts = [...state.posts, ...updatedPost];
             }
             watchedState.form.processState = 'success';
-            return Promise.resolve();
           })
           .catch((e) => {
             console.log(e.message);
-            return Promise.resolve();
           }));
         watchedState.form.processState = 'filling';
-        Promise.allSettled(promises).then(() => {
+        Promise.allSettled(promises).finally(() => {
           setTimeout(checkUpdatePosts, 5000);
         });
       };
@@ -95,7 +95,7 @@ export default () => {
             .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
         });
 
-        watchedState.form.validState = 'validity';
+        watchedState.form.validState = null;
 
         schema.validate({ link })
           .then(() => {
@@ -103,26 +103,31 @@ export default () => {
             axios.get(completionURL(link))
               .then((response) => {
                 const data = parserRSS(response, link);
-                watchedState.form.validState = 'valid';
+                watchedState.form.validState = true;
                 data.feed.id = generateId();
                 const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
                 state.feeds.push(data.feed);
                 state.posts = [...state.posts, ...postWithId];
                 watchedState.form.processState = 'success';
-                if (state.UIstate.updateStatus === 'false') {
-                  state.UIstate.updateStatus = 'true';
-                  checkUpdatePosts();
-                }
               })
               .catch((err) => {
-                state.form.errors = axios.isAxiosError(err) ? 'errors.networkProblem' : 'errors.invalidRSS';
-                watchedState.form.validState = 'invalid';
+                const defineError = (error) => {
+                  if (error.isParsingError) {
+                    return 'errors.invalidRSS';
+                  }
+                  if (axios.isAxiosError(error)) {
+                    return 'errors.networkProblem';
+                  }
+                  return 'errors.defect';
+                };
+                state.form.errors = defineError(err);
+                watchedState.form.validState = false;
                 throw err;
               });
           })
           .catch((err) => {
             state.form.errors = err.errors;
-            watchedState.form.validState = 'invalid';
+            watchedState.form.validState = false;
             throw err;
           });
         watchedState.form.processState = 'filling';
@@ -130,21 +135,13 @@ export default () => {
 
       elements.containers.postsContainer.addEventListener('click', (e) => {
         const click = e.target;
-        const set = new Set(state.UIstate.viewedPostsId);
-        set.add(Number(click.dataset.id));
-        state.UIstate.viewedPostsId = set;
-        switch (click.tagName) {
-          case 'A':
-            watchedState.form.processState = 'openLink';
-            break;
-          case 'BUTTON':
-            watchedState.form.processState = 'openModalWindow';
-            break;
-
-          default:
-            break;
-        }
+        const currentId = Number(click.dataset.id);
+        const [post] = state.posts.filter((el) => el.id === currentId);
+        state.UIstate.viewedPosts.add(post);
+        state.UIstate.currentPostsId = currentId;
+        watchedState.form.processState = click.tagName === 'BUTTON' ? 'openModalWindow' : 'openLink';
         watchedState.form.processState = 'filling';
       });
+      checkUpdatePosts();
     });
 };

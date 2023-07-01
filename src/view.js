@@ -34,8 +34,7 @@ const renderPosts = (elements, state, i18n) => {
     postsList.append(post);
     post.append(postTitle, postButton);
 
-    const viewedPosts = new Set(state.UIstate.viewedPostsId);
-    if (viewedPosts.has(element.id)) {
+    if (state.UIstate.viewedPosts.has(element)) {
       postTitle.classList.remove('fw-bold');
       postTitle.classList.add('fw-normal', 'link-secondary');
     }
@@ -77,26 +76,26 @@ const renderFeeds = (elements, state, i18n) => {
 };
 
 const renderState = (elements, state, i18n) => {
-  if (state.form.validState === 'invalid') {
+  if (state.form.validState === false) {
     const validFeedback = elements.feedback;
-    elements.input.classList.remove('is-valid');
-    elements.input.classList.add('is-invalid');
+    // elements.input.classList.remove('is-valid');
+    // elements.input.classList.add('is-invalid');
     validFeedback.classList.remove('text-success');
     validFeedback.classList.add('text-danger');
     validFeedback.textContent = i18n.t(state.form.errors);
   }
 
-  if (state.form.validState === 'valid') {
+  if (state.form.validState === true) {
     const invalidFeedback = elements.feedback;
-    elements.input.classList.remove('is-invalid');
-    elements.input.classList.add('is-valid');
+    // elements.input.classList.remove('is-invalid');
+    // elements.input.classList.add('is-valid');
     invalidFeedback.classList.remove('text-danger');
     invalidFeedback.classList.add('text-success');
     invalidFeedback.textContent = i18n.t('success');
     elements.rssForm.reset();
   }
 
-  if (state.form.validState === 'validity') {
+  if (state.form.validState === null) {
     const invalidFeedback = elements.feedback;
     elements.input.classList.remove('is-invalid');
     elements.input.classList.remove('is-valid');
@@ -111,17 +110,12 @@ const modalWindow = (state) => {
   const titleModal = document.querySelector('.modal-title');
   const bodyModal = document.querySelector('.modal-body');
   const btnModal = document.querySelector('.btn-primary');
-  const viewedPosts = new Set(state.UIstate.viewedPostsId);
-  const latestId = Array.from(viewedPosts).pop();
-  const postModal = state.posts.reduce((acc, post) => {
-    if (post.id === latestId) {
-      Object.assign(acc, post);
-    }
-    return acc;
-  }, {});
 
-  const { title, description, link } = postModal;
-  const postElement = document.querySelector(`[data-id='${latestId}']`);
+  const currentId = state.UIstate.currentPostsId;
+  const [currentPost] = state.posts.filter((el) => el.id === currentId);
+
+  const { description, link, title } = currentPost;
+  const postElement = document.querySelector(`[data-id='${currentId}']`);
 
   if (postElement) {
     postElement.classList.remove('fw-bold');

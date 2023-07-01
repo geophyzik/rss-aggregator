@@ -19,8 +19,8 @@ export default (response, link) => {
       });
     });
     return { feed, posts };
-  } catch (e) {
-    e.message = 'unableToParse';
-    throw e;
+  } catch (err) {
+    err.isParsingError = 'unableToParse';
+    throw err;
   }
 };
