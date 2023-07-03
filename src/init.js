@@ -88,27 +88,25 @@ export default () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const link = formData.get('url');
-
+        watchedState.form.validState = null;
+        watchedState.form.processState = 'processing';
         const schema = yup.object().shape({
           link: yup.string().required().trim()
             .url('errors.badUrl')
             .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
         });
 
-        watchedState.form.validState = null;
-
         schema.validate({ link })
           .then(() => {
-            watchedState.form.processState = 'processing';
             axios.get(completionURL(link))
               .then((response) => {
                 const data = parserRSS(response, link);
-                watchedState.form.validState = true;
                 data.feed.id = generateId();
                 const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
                 state.feeds.push(data.feed);
                 state.posts = [...state.posts, ...postWithId];
                 watchedState.form.processState = 'success';
+                watchedState.form.validState = true;
               })
               .catch((err) => {
                 const defineError = (error) => {
@@ -130,7 +128,6 @@ export default () => {
             watchedState.form.validState = false;
             throw err;
           });
-        watchedState.form.processState = 'filling';
       });
 
       elements.containers.postsContainer.addEventListener('click', (e) => {

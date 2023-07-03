@@ -75,6 +75,17 @@ const renderFeeds = (elements, state, i18n) => {
   feedsTitleBox.append(feedsTitle, feedsList);
 };
 
+const renderClearState = (elements, state) => {
+  if (state.form.processState === 'processing') {
+    const invalidFeedback = elements.feedback;
+    // elements.input.classList.remove('is-invalid');
+    // elements.input.classList.remove('is-valid');
+    invalidFeedback.classList.remove('text-danger');
+    invalidFeedback.classList.remove('text-success');
+    invalidFeedback.textContent = '';
+  }
+};
+
 const renderState = (elements, state, i18n) => {
   if (state.form.validState === false) {
     const validFeedback = elements.feedback;
@@ -93,15 +104,6 @@ const renderState = (elements, state, i18n) => {
     invalidFeedback.classList.add('text-success');
     invalidFeedback.textContent = i18n.t('success');
     elements.rssForm.reset();
-  }
-
-  if (state.form.validState === null) {
-    const invalidFeedback = elements.feedback;
-    elements.input.classList.remove('is-invalid');
-    elements.input.classList.remove('is-valid');
-    invalidFeedback.classList.remove('text-danger');
-    invalidFeedback.classList.remove('text-success');
-    invalidFeedback.textContent = '';
   }
   elements.input.focus();
 };
@@ -141,8 +143,6 @@ export default (elements, state, i18n) => {
         if (state.form.processState === 'success') {
           renderFeeds(elements, state, i18n);
           renderPosts(elements, state, i18n);
-          mainButton.disabled = false;
-          mainInput.disabled = false;
         }
         if (state.form.processState === 'openModalWindow') {
           modalWindow(state);
@@ -150,6 +150,7 @@ export default (elements, state, i18n) => {
         if (state.form.processState === 'processing') {
           mainButton.disabled = true;
           mainInput.disabled = true;
+          renderClearState(elements, state);
         }
         if (state.form.processState === 'filling') {
           mainButton.disabled = false;
