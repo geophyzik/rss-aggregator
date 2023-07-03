@@ -87,7 +87,7 @@ const renderClearState = (elements, state) => {
 };
 
 const renderState = (elements, state, i18n) => {
-  if (state.form.validState === false) {
+  if (state.form.processState === 'failed') {
     const validFeedback = elements.feedback;
     // elements.input.classList.remove('is-valid');
     // elements.input.classList.add('is-invalid');
@@ -96,7 +96,7 @@ const renderState = (elements, state, i18n) => {
     validFeedback.textContent = i18n.t(state.form.errors);
   }
 
-  if (state.form.validState === true) {
+  if (state.form.processState === 'success') {
     const invalidFeedback = elements.feedback;
     // elements.input.classList.remove('is-invalid');
     // elements.input.classList.add('is-valid');
@@ -130,35 +130,39 @@ const modalWindow = (state) => {
 };
 
 export default (elements, state, i18n) => {
-  const watchedState = onChange(state, (path) => {
+  const watchedState = onChange(state, (path, value) => {
     const mainButton = elements.mainBtn;
     const mainInput = elements.input;
-    switch (path) {
-      case 'form.validState':
+    switch (value) {
+      case 'success':
+        renderState(elements, state, i18n);
+        renderFeeds(elements, state, i18n);
+        renderPosts(elements, state, i18n);
+        mainButton.disabled = false;
+        mainInput.disabled = false;
+        break;
+      case 'openModalWindow':
+        modalWindow(state);
+        break;
+      case 'processing':
+        mainButton.disabled = true;
+        mainInput.disabled = true;
+        renderClearState(elements, state);
+        break;
+      case 'filling':
+        mainButton.disabled = false;
+        mainInput.disabled = false;
+        break;
+      case 'openLink':
+        renderPosts(elements, state, i18n);
+        break;
+      case 'failed':
         renderState(elements, state, i18n);
         mainButton.disabled = false;
         mainInput.disabled = false;
         break;
-      case 'form.processState':
-        if (state.form.processState === 'success') {
-          renderFeeds(elements, state, i18n);
-          renderPosts(elements, state, i18n);
-        }
-        if (state.form.processState === 'openModalWindow') {
-          modalWindow(state);
-        }
-        if (state.form.processState === 'processing') {
-          mainButton.disabled = true;
-          mainInput.disabled = true;
-          renderClearState(elements, state);
-        }
-        if (state.form.processState === 'filling') {
-          mainButton.disabled = false;
-          mainInput.disabled = false;
-        }
-        if (state.form.processState === 'openLink') {
-          renderPosts(elements, state, i18n);
-        }
+      case 'update':
+        renderPosts(elements, state, i18n);
         break;
       default:
         break;

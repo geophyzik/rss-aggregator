@@ -19,14 +19,12 @@ export default () => {
         form: {
           processState: 'filling',
           errors: null,
-          validState: null,
         },
 
         feeds: [],
         posts: [],
 
         UIstate: {
-          updateStatus: 'false',
           viewedPosts: new Set(),
           currentPostsId: null,
         },
@@ -73,7 +71,7 @@ export default () => {
             if (updatedPost.length > 0) {
               state.posts = [...state.posts, ...updatedPost];
             }
-            watchedState.form.processState = 'success';
+            watchedState.form.processState = 'update';
           })
           .catch((e) => {
             console.log(e.message);
@@ -88,8 +86,8 @@ export default () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const link = formData.get('url');
-        watchedState.form.validState = null;
         watchedState.form.processState = 'processing';
+
         const schema = yup.object().shape({
           link: yup.string().required().trim()
             .url('errors.badUrl')
@@ -106,7 +104,6 @@ export default () => {
                 state.feeds.push(data.feed);
                 state.posts = [...state.posts, ...postWithId];
                 watchedState.form.processState = 'success';
-                watchedState.form.validState = true;
               })
               .catch((err) => {
                 const defineError = (error) => {
@@ -119,13 +116,13 @@ export default () => {
                   return 'errors.defect';
                 };
                 state.form.errors = defineError(err);
-                watchedState.form.validState = false;
+                watchedState.form.processState = 'failed';
                 throw err;
               });
           })
           .catch((err) => {
             state.form.errors = err.errors;
-            watchedState.form.validState = false;
+            watchedState.form.processState = 'failed';
             throw err;
           });
       });
