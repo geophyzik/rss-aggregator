@@ -78,11 +78,12 @@ export default () => {
       const checkUpdatePosts = () => {
         const promises = state.feeds.map((eachFeed) => axios.get(completionURL(eachFeed.url))
           .then((response) => {
-            const getData = parserRSS(response, eachFeed.url);
-            const newData = getData.posts;
-            const oldData = state.posts;
-            const newPosts = newData.filter((e1) => !oldData.some((e2) => e2.title === e1.title));
-            const updatedPost = newPosts.map((el) => ({ ...el, id: generateId() }));
+            const responseData = response.data.contents;
+            const dataFromParse = parserRSS(responseData, eachFeed.url);
+            const newPosts = dataFromParse.posts;
+            const oldPosts = state.posts;
+            const newData = newPosts.filter((e1) => !oldPosts.some((e2) => e2.title === e1.title));
+            const updatedPost = newData.map((el) => ({ ...el, id: generateId() }));
             if (updatedPost.length > 0) {
               state.posts = [...state.posts, ...updatedPost];
             }
@@ -107,7 +108,8 @@ export default () => {
           .then(() => {
             axios.get(completionURL(link))
               .then((response) => {
-                const data = parserRSS(response, link);
+                const responseData = response.data.contents;
+                const data = parserRSS(responseData, link);
                 data.feed.id = generateId();
                 const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
                 state.feeds.push(data.feed);
