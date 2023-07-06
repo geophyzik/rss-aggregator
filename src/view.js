@@ -88,8 +88,6 @@ const renderClearState = (elements, state) => {
 const renderState = (elements, state, i18n) => {
   if (state.form.processState === 'failed') {
     const validFeedback = elements.feedback;
-    // elements.input.classList.remove('is-valid');
-    // elements.input.classList.add('is-invalid');
     validFeedback.classList.remove('text-success');
     validFeedback.classList.add('text-danger');
     validFeedback.textContent = i18n.t(state.form.errors);
@@ -97,8 +95,6 @@ const renderState = (elements, state, i18n) => {
 
   if (state.form.processState === 'success') {
     const invalidFeedback = elements.feedback;
-    // elements.input.classList.remove('is-invalid');
-    // elements.input.classList.add('is-valid');
     invalidFeedback.classList.remove('text-danger');
     invalidFeedback.classList.add('text-success');
     invalidFeedback.textContent = i18n.t('success');
@@ -113,7 +109,7 @@ const modalWindow = (state) => {
   const btnModal = document.querySelector('.btn-primary');
 
   const currentId = state.UIstate.currentPostsId;
-  const [currentPost] = state.posts.filter((el) => el.id === currentId);
+  const currentPost = state.posts.find((el) => el.id === currentId);
 
   const { description, link, title } = currentPost;
   const postElement = document.querySelector(`[data-id='${currentId}']`);

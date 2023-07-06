@@ -130,7 +130,8 @@ export default () => {
       elements.containers.postsContainer.addEventListener('click', (e) => {
         const click = e.target;
         const currentId = Number(click.dataset.id);
-        const [post] = state.posts.filter((el) => el.id === currentId);
+        const post = state.posts.find((el) => el.id === currentId);
+        // console.log(state.posts.find((el) => el.id === currentId)); //
         state.UIstate.viewedPosts.add(post);
         state.UIstate.currentPostsId = currentId;
         watchedState.form.processState = click.tagName === 'BUTTON' ? 'openModalWindow' : 'openLink';
