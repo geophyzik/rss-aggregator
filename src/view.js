@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import onChange from 'on-change';
 
 const renderPosts = (elements, state, i18n) => {

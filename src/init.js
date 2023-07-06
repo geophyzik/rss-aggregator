@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
@@ -58,6 +57,22 @@ export default () => {
         return func;
       })();
 
+      const schema = yup.object().shape({
+        link: yup.string().required().trim()
+          .url('errors.badUrl')
+          .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
+      });
+
+      const defineError = (error) => {
+        if (error.isParsingError) {
+          return 'errors.invalidRSS';
+        }
+        if (axios.isAxiosError(error)) {
+          return 'errors.networkProblem';
+        }
+        return 'errors.defect';
+      };
+
       const watchedState = watch(elements, state, i18n);
 
       const checkUpdatePosts = () => {
@@ -88,12 +103,6 @@ export default () => {
         const link = formData.get('url');
         watchedState.form.processState = 'processing';
 
-        const schema = yup.object().shape({
-          link: yup.string().required().trim()
-            .url('errors.badUrl')
-            .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
-        });
-
         schema.validate({ link })
           .then(() => {
             axios.get(completionURL(link))
@@ -106,15 +115,6 @@ export default () => {
                 watchedState.form.processState = 'success';
               })
               .catch((err) => {
-                const defineError = (error) => {
-                  if (error.isParsingError) {
-                    return 'errors.invalidRSS';
-                  }
-                  if (axios.isAxiosError(error)) {
-                    return 'errors.networkProblem';
-                  }
-                  return 'errors.defect';
-                };
                 state.form.errors = defineError(err);
                 watchedState.form.processState = 'failed';
                 throw err;
