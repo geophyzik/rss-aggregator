@@ -57,10 +57,10 @@ export default () => {
         return func;
       })();
 
-      const schema = yup.object().shape({
+      const updateSchema = (data) => yup.object().shape({
         link: yup.string().required().trim()
           .url('errors.badUrl')
-          .notOneOf(state.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
+          .notOneOf(data.feeds.map((feed) => feed.url.trim()), 'errors.duplicate'),
       });
 
       const defineError = (error) => {
@@ -70,7 +70,7 @@ export default () => {
         if (axios.isAxiosError(error)) {
           return 'errors.networkProblem';
         }
-        return 'errors.defect';
+        return error.errors ?? 'errors.defect';
       };
 
       const watchedState = watch(elements, state, i18n);
@@ -105,32 +105,27 @@ export default () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const link = formData.get('url');
+        const schema = updateSchema(state);
         watchedState.form.processState = 'processing';
 
-        schema.validate({ link })
-          .then(() => {
-            axios.get(completionURL(link))
-              .then((response) => {
-                const responseData = response.data.contents;
-                const data = parserRSS(responseData, link);
-                data.feed.id = generateId();
-                const idFromFeed = data.feed.id;
-                const postWithId = data.posts.map((el) => {
-                  const updatedPost = { ...el, id: generateId(), feedId: idFromFeed };
-                  return updatedPost;
-                });
-                state.feeds.push(data.feed);
-                state.posts = [...state.posts, ...postWithId];
-                watchedState.form.processState = 'success';
-              })
-              .catch((err) => {
-                state.form.errors = defineError(err);
-                watchedState.form.processState = 'failed';
-                throw err;
-              });
+        schema
+          .validate({ link })
+          .then(() => axios.get(completionURL(link)))
+          .then((response) => {
+            const responseData = response.data.contents;
+            const data = parserRSS(responseData, link);
+            data.feed.id = generateId();
+            const idFromFeed = data.feed.id;
+            const postWithId = data.posts.map((el) => {
+              const updatedPost = { ...el, id: generateId(), feedId: idFromFeed };
+              return updatedPost;
+            });
+            state.feeds.push(data.feed);
+            state.posts = [...state.posts, ...postWithId];
+            watchedState.form.processState = 'success';
           })
           .catch((err) => {
-            state.form.errors = err.errors;
+            state.form.errors = defineError(err);
             watchedState.form.processState = 'failed';
             throw err;
           });
@@ -144,6 +139,7 @@ export default () => {
         watchedState.form.processState = click.tagName === 'BUTTON' ? 'openModalWindow' : 'openLink';
         watchedState.form.processState = 'filling';
       });
+
       checkUpdatePosts();
     });
 };
