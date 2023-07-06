@@ -10,7 +10,7 @@ export default () => {
   const i18n = i18next.createInstance();
   i18n.init({
     lng: defaultLanguage,
-    debug: true,
+    debug: false,
     resources: { ru },
   })
     .then(() => {
@@ -82,10 +82,13 @@ export default () => {
             const dataFromParse = parserRSS(responseData, eachFeed.url);
             const newPosts = dataFromParse.posts;
             const oldPosts = state.posts;
-            const newData = newPosts.filter((e1) => !oldPosts.some((e2) => e2.title === e1.title));
-            const updatedPost = newData.map((el) => ({ ...el, id: generateId() }));
-            if (updatedPost.length > 0) {
-              state.posts = [...state.posts, ...updatedPost];
+            const newData = newPosts.filter((e1) => !oldPosts.some((e2) => e2.link === e1.link));
+            const postWithId = newData.map((el) => {
+              const updatedPost = { ...el, id: generateId(), feedId: eachFeed.id };
+              return updatedPost;
+            });
+            if (postWithId.length > 0) {
+              state.posts = [...state.posts, ...postWithId];
             }
             watchedState.form.processState = 'update';
           })
@@ -111,7 +114,11 @@ export default () => {
                 const responseData = response.data.contents;
                 const data = parserRSS(responseData, link);
                 data.feed.id = generateId();
-                const postWithId = data.posts.map((el) => ({ ...el, id: generateId() }));
+                const idFromFeed = data.feed.id;
+                const postWithId = data.posts.map((el) => {
+                  const updatedPost = { ...el, id: generateId(), feedId: idFromFeed };
+                  return updatedPost;
+                });
                 state.feeds.push(data.feed);
                 state.posts = [...state.posts, ...postWithId];
                 watchedState.form.processState = 'success';
@@ -133,7 +140,6 @@ export default () => {
         const click = e.target;
         const currentId = Number(click.dataset.id);
         const post = state.posts.find((el) => el.id === currentId);
-        // console.log(state.posts.find((el) => el.id === currentId)); //
         state.UIstate.viewedPosts.add(post);
         state.UIstate.currentPostsId = currentId;
         watchedState.form.processState = click.tagName === 'BUTTON' ? 'openModalWindow' : 'openLink';
