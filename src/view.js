@@ -33,7 +33,7 @@ const renderPosts = (elements, state, i18n) => {
     postsList.append(post);
     post.append(postTitle, postButton);
 
-    if (state.UIstate.viewedPosts.has(element)) {
+    if (state.UIstate.viewedPosts.has(element.id)) {
       postTitle.classList.remove('fw-bold');
       postTitle.classList.add('fw-normal', 'link-secondary');
     }
