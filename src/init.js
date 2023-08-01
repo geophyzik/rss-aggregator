@@ -129,6 +129,7 @@ export default () => {
             watchedState.form.processState = 'failed';
             throw err;
           });
+          // console.log(state)
       });
 
       elements.containers.postsContainer.addEventListener('click', (e) => {
